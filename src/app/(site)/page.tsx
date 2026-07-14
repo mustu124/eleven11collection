@@ -32,8 +32,8 @@ export default async function Home() {
   return (
     <div>
       <HeroCarousel banners={heroBanners} />
-      <BestOfferBanner offer={featuredOffer} />
       <CategoryCircles categories={categories} />
+      <BestOfferBanner offer={featuredOffer} />
       <TopStyles items={topStyles} />
       <MoodCarousel banners={moodBanners} />
       <GiftsSplitBanner banners={giftBanners} />
