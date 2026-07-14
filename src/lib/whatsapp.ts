@@ -1,13 +1,18 @@
+import { SITE_URL } from "./site";
+
 export type WhatsAppOrderItem = {
   name: string;
   qty: number;
   price: number;
+  // Absent for carts saved before this field existed, or for a product
+  // that's since been removed from the catalog — the link line is just
+  // skipped for that item rather than pointing at a dead/guessed URL.
+  slug: string | null;
 };
 
 export function buildOrderMessage({
   orderRef,
   customerName,
-  phone,
   address,
   pincode,
   items,
@@ -15,16 +20,18 @@ export function buildOrderMessage({
 }: {
   orderRef: string;
   customerName: string;
-  phone: string;
   address: string;
   pincode: string;
   items: WhatsAppOrderItem[];
   total: number;
 }): string {
-  const itemLines = items.map(
-    (item, i) =>
-      `${i + 1}. ${item.name} — Qty: ${item.qty} — ₹${item.price.toLocaleString("en-IN")} each`
-  );
+  const itemLines = items.flatMap((item, i) => {
+    const lines = [
+      `${i + 1}. ${item.name} — Qty: ${item.qty} — ₹${item.price.toLocaleString("en-IN")} each`,
+    ];
+    if (item.slug) lines.push(`   ${SITE_URL}/product/${item.slug}`);
+    return lines;
+  });
 
   return [
     "New Order — Eleven11 Collection",
@@ -38,7 +45,6 @@ export function buildOrderMessage({
     customerName,
     address,
     `Pincode: ${pincode}`,
-    `Phone: ${phone}`,
   ].join("\n");
 }
 

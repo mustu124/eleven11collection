@@ -10,10 +10,6 @@ type CartItemPayload = {
   image: unknown;
 };
 
-function isValidPhone(phone: string) {
-  return /^\d{10}$/.test(phone.trim());
-}
-
 function isValidPincode(pincode: string) {
   return /^\d{6}$/.test(pincode.trim());
 }
@@ -21,7 +17,6 @@ function isValidPincode(pincode: string) {
 export async function POST(request: NextRequest) {
   let body: {
     customerName?: unknown;
-    phone?: unknown;
     address?: unknown;
     pincode?: unknown;
     cartItems?: unknown;
@@ -34,16 +29,12 @@ export async function POST(request: NextRequest) {
   }
 
   const customerName = typeof body.customerName === "string" ? body.customerName.trim() : "";
-  const phone = typeof body.phone === "string" ? body.phone.trim() : "";
   const address = typeof body.address === "string" ? body.address.trim() : "";
   const pincode = typeof body.pincode === "string" ? body.pincode.trim() : "";
   const cartItems = Array.isArray(body.cartItems) ? (body.cartItems as CartItemPayload[]) : null;
 
-  if (!customerName || !phone || !address || !pincode) {
+  if (!customerName || !address || !pincode) {
     return NextResponse.json({ error: "All fields are required." }, { status: 400 });
-  }
-  if (!isValidPhone(phone)) {
-    return NextResponse.json({ error: "Phone number must be 10 digits." }, { status: 400 });
   }
   if (!isValidPincode(pincode)) {
     return NextResponse.json({ error: "Pincode must be 6 digits." }, { status: 400 });
@@ -75,7 +66,11 @@ export async function POST(request: NextRequest) {
     .from("orders")
     .insert({
       customer_name: customerName,
-      phone,
+      // Phone is no longer collected at checkout (the order arrives on
+      // WhatsApp sent from the customer's own number, so asking again was
+      // redundant) — the column is still NOT NULL, so this satisfies it
+      // without a schema migration.
+      phone: "",
       address,
       pincode,
       cart_items: cartItems,

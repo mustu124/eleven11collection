@@ -29,7 +29,6 @@ export default async function AdminDashboardPage() {
             <thead className="border-b border-ink/10 text-xs uppercase tracking-wide text-ink-soft">
               <tr>
                 <th className="px-4 py-3">Customer</th>
-                <th className="px-4 py-3">Phone</th>
                 <th className="px-4 py-3">Items</th>
                 <th className="px-4 py-3">Total</th>
                 <th className="px-4 py-3">Status</th>
@@ -40,7 +39,6 @@ export default async function AdminDashboardPage() {
               {orders.map((order) => (
                 <tr key={order.id} className="border-b border-ink/5 last:border-0">
                   <td className="px-4 py-3 text-ink">{order.customerName}</td>
-                  <td className="px-4 py-3 text-ink-soft">{order.phone}</td>
                   <td className="px-4 py-3 text-ink-soft">{order.itemCount}</td>
                   <td className="px-4 py-3 text-ink">₹{order.total.toLocaleString("en-IN")}</td>
                   <td className="px-4 py-3">

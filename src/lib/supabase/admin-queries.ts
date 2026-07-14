@@ -4,7 +4,6 @@ import { createSupabaseServerClient } from "./server-session";
 export type AdminOrder = {
   id: string;
   customerName: string;
-  phone: string;
   total: number;
   status: string;
   itemCount: number;
@@ -15,7 +14,7 @@ export async function getRecentOrders(limit = 10): Promise<AdminOrder[]> {
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase
     .from("orders")
-    .select("id, customer_name, phone, total, status, cart_items, created_at")
+    .select("id, customer_name, total, status, cart_items, created_at")
     .order("created_at", { ascending: false })
     .limit(limit);
 
@@ -27,7 +26,6 @@ export async function getRecentOrders(limit = 10): Promise<AdminOrder[]> {
   return (data ?? []).map((row) => ({
     id: row.id,
     customerName: row.customer_name,
-    phone: row.phone,
     total: row.total,
     status: row.status,
     itemCount: Array.isArray(row.cart_items) ? row.cart_items.length : 0,

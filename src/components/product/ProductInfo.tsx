@@ -61,6 +61,7 @@ export function ProductInfo({
         name: selectedVariant ? `${product.name} — ${selectedVariant.name}` : product.name,
         price: effectivePrice,
         image,
+        slug: product.slug,
       },
       qty
     );

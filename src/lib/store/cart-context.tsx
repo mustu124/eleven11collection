@@ -16,6 +16,10 @@ export type CartItem = {
   price: number;
   image: string | null;
   qty: number;
+  // Optional because carts already in a customer's localStorage from before
+  // this field existed won't have it — treat as "no link available" rather
+  // than crashing.
+  slug?: string;
 };
 
 type CartState = {

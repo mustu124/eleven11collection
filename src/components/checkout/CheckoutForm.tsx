@@ -7,15 +7,12 @@ import { buildOrderMessage, getWhatsAppCheckoutUrl } from "@/lib/whatsapp";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { BackButton } from "@/components/ui/BackButton";
 
-type Fields = { name: string; phone: string; address: string; pincode: string };
+type Fields = { name: string; address: string; pincode: string };
 type FieldErrors = Partial<Record<keyof Fields, string>>;
 
 function validate(fields: Fields): FieldErrors {
   const errors: FieldErrors = {};
   if (!fields.name.trim()) errors.name = "Name is required.";
-  if (!fields.phone.trim()) errors.phone = "Phone number is required.";
-  else if (!/^\d{10}$/.test(fields.phone.trim()))
-    errors.phone = "Phone number must be exactly 10 digits.";
   if (!fields.address.trim()) errors.address = "Address is required.";
   if (!fields.pincode.trim()) errors.pincode = "Pincode is required.";
   else if (!/^\d{6}$/.test(fields.pincode.trim()))
@@ -27,7 +24,6 @@ export function CheckoutForm() {
   const cart = useCart();
   const [fields, setFields] = useState<Fields>({
     name: "",
-    phone: "",
     address: "",
     pincode: "",
   });
@@ -74,7 +70,6 @@ export function CheckoutForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           customerName: fields.name,
-          phone: fields.phone,
           address: fields.address,
           pincode: fields.pincode,
           cartItems: cart.items,
@@ -92,10 +87,9 @@ export function CheckoutForm() {
       const message = buildOrderMessage({
         orderRef: ref,
         customerName: fields.name,
-        phone: fields.phone,
         address: fields.address,
         pincode: fields.pincode,
-        items: cart.items.map((i) => ({ name: i.name, qty: i.qty, price: i.price })),
+        items: cart.items.map((i) => ({ name: i.name, qty: i.qty, price: i.price, slug: i.slug ?? null })),
         total: data.total,
       });
       const url = getWhatsAppCheckoutUrl(message);
@@ -209,28 +203,6 @@ export function CheckoutForm() {
             {fieldErrors.name && (
               <p id="name-error" role="alert" className="mt-1 font-sans text-xs text-red-600">
                 {fieldErrors.name}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <label htmlFor="phone" className="mb-1 block font-sans text-xs uppercase tracking-wide text-ink-soft">
-              Phone Number
-            </label>
-            <input
-              id="phone"
-              type="tel"
-              inputMode="numeric"
-              value={fields.phone}
-              onChange={(e) => updateField("phone", e.target.value)}
-              aria-invalid={!!fieldErrors.phone}
-              aria-describedby={fieldErrors.phone ? "phone-error" : undefined}
-              placeholder="10-digit mobile number"
-              className="w-full min-h-11 rounded-md border border-ink/15 px-3 py-2 font-sans text-sm text-ink focus:outline-none focus:ring-1 focus:ring-gold"
-            />
-            {fieldErrors.phone && (
-              <p id="phone-error" role="alert" className="mt-1 font-sans text-xs text-red-600">
-                {fieldErrors.phone}
               </p>
             )}
           </div>
