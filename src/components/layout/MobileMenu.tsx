@@ -9,7 +9,7 @@ import type { NavCategory } from "@/lib/supabase/queries";
 const FOOTER_LINKS = [
   { label: "About Us", href: "/about" },
   { label: "Contact", href: "/contact" },
-  { label: "Track Order", href: "/track-order" },
+  { label: "Offer Zone", href: "/offers" },
 ];
 
 export function MobileMenu({
@@ -94,7 +94,6 @@ export function MobileMenu({
                 <Link
                   href={link.href}
                   onClick={onClose}
-                  prefetch={false}
                   className="flex min-h-11 items-center font-sans text-sm text-ink-soft hover:text-gold"
                 >
                   {link.label}
