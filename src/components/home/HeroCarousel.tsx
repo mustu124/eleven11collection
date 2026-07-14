@@ -34,7 +34,7 @@ export function HeroCarousel({ banners }: { banners: HomeBanner[] }) {
 
   return (
     <section aria-label="Featured">
-      <Carousel slides={slides} ariaLabel="Hero banners" />
+      <Carousel slides={slides} ariaLabel="Hero banners" autoRotate />
     </section>
   );
 }

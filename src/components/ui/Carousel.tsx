@@ -16,16 +16,22 @@ export function Carousel({
   showDots = true,
   slideClassName = "w-full shrink-0 snap-center",
   className = "",
+  autoRotate = false,
+  autoRotateInterval = 5000,
 }: {
   slides: React.ReactNode[];
   ariaLabel: string;
   showDots?: boolean;
   slideClassName?: string;
   className?: string;
+  autoRotate?: boolean;
+  autoRotateInterval?: number;
 }) {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
+  const activeIndexRef = useRef(activeIndex);
+  activeIndexRef.current = activeIndex;
   const canScroll = slides.length > 1;
 
   useEffect(() => {
@@ -52,6 +58,16 @@ export function Carousel({
     const target = slideRefs.current[index];
     target?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
   }
+
+  useEffect(() => {
+    if (!canScroll || !autoRotate) return;
+
+    const id = setInterval(() => {
+      scrollToIndex((activeIndexRef.current + 1) % slides.length);
+    }, autoRotateInterval);
+
+    return () => clearInterval(id);
+  }, [canScroll, autoRotate, autoRotateInterval, slides.length]);
 
   const dots = useMemo(() => slides.map((_, i) => i), [slides]);
 
