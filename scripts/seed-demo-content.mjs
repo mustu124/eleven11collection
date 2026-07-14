@@ -147,7 +147,6 @@ const BANNERS = [
   { section: "mood_party", image_url: placeholder("Party Wear", 600, 800), link_url: "/category/rings", sort_order: 2 },
   { section: "mood_dayout", image_url: placeholder("Day Out", 600, 800), link_url: "/category/bracelets", sort_order: 3 },
   { section: "gifting_her", image_url: placeholder("Gifts for Her", 900, 1200), link_url: "/category/earrings", sort_order: 1 },
-  { section: "gifting_him", image_url: placeholder("Gifts for Him", 900, 1200), link_url: "/category/watches", sort_order: 2 },
 ];
 const { error: bannerError } = await admin.from("homepage_banners").insert(BANNERS);
 if (bannerError) throw bannerError;

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/server";
+import { calculateShippingFee } from "@/lib/shipping";
 
 type CartItemPayload = {
   productId: unknown;
@@ -43,9 +44,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Your cart is empty." }, { status: 400 });
   }
 
-  // Recompute the total server-side from the cart snapshot rather than
+  // Recompute the subtotal server-side from the cart snapshot rather than
   // trusting a client-sent number.
-  let total = 0;
+  let subtotal = 0;
   for (const item of cartItems) {
     if (
       typeof item.name !== "string" ||
@@ -59,8 +60,11 @@ export async function POST(request: NextRequest) {
     ) {
       return NextResponse.json({ error: "Invalid item in cart." }, { status: 400 });
     }
-    total += item.price * item.qty;
+    subtotal += item.price * item.qty;
   }
+
+  const shippingFee = calculateShippingFee(subtotal);
+  const total = subtotal + shippingFee;
 
   const { data, error } = await supabaseAdmin
     .from("orders")
@@ -87,5 +91,5 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  return NextResponse.json({ orderId: data.id, total });
+  return NextResponse.json({ orderId: data.id, subtotal, shippingFee, total });
 }

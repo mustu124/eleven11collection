@@ -11,6 +11,7 @@ const NAV_LINKS = [
   { href: "/admin/products", label: "Products" },
   { href: "/admin/categories", label: "Categories" },
   { href: "/admin/homepage", label: "Homepage" },
+  { href: "/admin/offers", label: "Offers" },
 ];
 
 export function AdminHeader() {

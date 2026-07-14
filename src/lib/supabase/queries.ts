@@ -82,7 +82,7 @@ export async function getMoodBanners(): Promise<HomeBanner[]> {
 }
 
 export function getGiftBanners(): Promise<HomeBanner[]> {
-  return getBannersBySections(["gifting_her", "gifting_him"]);
+  return getBannersBySections(["gifting_her"]);
 }
 
 export type ProductCardData = {
@@ -421,4 +421,63 @@ export async function getCurrentPrices(items: CartPriceCheck[]): Promise<Current
     }
   }
   return results;
+}
+
+export type Offer = {
+  id: string;
+  title: string;
+  description: string | null;
+  imageUrl: string | null;
+  linkUrl: string | null;
+};
+
+const OFFER_COLUMNS = "id, title, description, image_url, link_url, is_featured, sort_order";
+
+function mapOfferRow(row: {
+  id: string;
+  title: string;
+  description: string | null;
+  image_url: string | null;
+  link_url: string | null;
+}): Offer {
+  return {
+    id: row.id,
+    title: row.title,
+    description: row.description,
+    imageUrl: row.image_url,
+    linkUrl: row.link_url,
+  };
+}
+
+export async function getActiveOffers(): Promise<Offer[]> {
+  const { data, error } = await supabase
+    .from("offers")
+    .select(OFFER_COLUMNS)
+    .eq("is_active", true)
+    .order("sort_order", { ascending: true });
+
+  if (error) {
+    console.error("Failed to load offers:", error.message);
+    return [];
+  }
+
+  return (data ?? []).map(mapOfferRow);
+}
+
+export async function getFeaturedOffer(): Promise<Offer | null> {
+  const { data, error } = await supabase
+    .from("offers")
+    .select(OFFER_COLUMNS)
+    .eq("is_active", true)
+    .eq("is_featured", true)
+    .order("sort_order", { ascending: true })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+    console.error("Failed to load featured offer:", error.message);
+    return null;
+  }
+
+  return data ? mapOfferRow(data) : null;
 }

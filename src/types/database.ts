@@ -133,6 +133,32 @@ export type Database = {
         Update: Partial<Database["public"]["Tables"]["homepage_banners"]["Insert"]>;
         Relationships: [];
       };
+      offers: {
+        Row: {
+          id: string;
+          title: string;
+          description: string | null;
+          image_url: string | null;
+          link_url: string | null;
+          is_featured: boolean;
+          is_active: boolean;
+          sort_order: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          title: string;
+          description?: string | null;
+          image_url?: string | null;
+          link_url?: string | null;
+          is_featured?: boolean;
+          is_active?: boolean;
+          sort_order?: number;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["offers"]["Insert"]>;
+        Relationships: [];
+      };
       homepage_top_styles: {
         Row: {
           id: string;

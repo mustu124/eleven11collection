@@ -1,5 +1,6 @@
 import {
   getActiveCategories,
+  getFeaturedOffer,
   getGiftBanners,
   getHeroBanners,
   getMoodBanners,
@@ -10,6 +11,7 @@ import { CategoryCircles } from "@/components/home/CategoryCircles";
 import { TopStyles } from "@/components/home/TopStyles";
 import { MoodCarousel } from "@/components/home/MoodCarousel";
 import { GiftsSplitBanner } from "@/components/home/GiftsSplitBanner";
+import { BestOfferBanner } from "@/components/home/BestOfferBanner";
 
 // Without this, Next prerenders the homepage once at build time and it goes
 // stale the moment an admin edits hero banners/categories/top styles via the
@@ -18,17 +20,19 @@ import { GiftsSplitBanner } from "@/components/home/GiftsSplitBanner";
 export const revalidate = 60;
 
 export default async function Home() {
-  const [categories, heroBanners, moodBanners, giftBanners, topStyles] = await Promise.all([
+  const [categories, heroBanners, moodBanners, giftBanners, topStyles, featuredOffer] = await Promise.all([
     getActiveCategories(),
     getHeroBanners(),
     getMoodBanners(),
     getGiftBanners(),
     getTopStyles(),
+    getFeaturedOffer(),
   ]);
 
   return (
     <div>
       <HeroCarousel banners={heroBanners} />
+      <BestOfferBanner offer={featuredOffer} />
       <CategoryCircles categories={categories} />
       <TopStyles items={topStyles} />
       <MoodCarousel banners={moodBanners} />

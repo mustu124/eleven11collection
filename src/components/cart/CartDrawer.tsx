@@ -8,6 +8,7 @@ import { Minus, Plus, X } from "lucide-react";
 import { useCart } from "@/lib/store/cart-context";
 import { useFocusTrap } from "@/lib/hooks/useFocusTrap";
 import { getCurrentPrices } from "@/lib/supabase/queries";
+import { calculateShippingFee, FREE_SHIPPING_THRESHOLD } from "@/lib/shipping";
 
 function lineKey(productId: string, variantId: string | null) {
   return `${productId}:${variantId ?? ""}`;
@@ -59,7 +60,9 @@ export function CartDrawer() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cart.isOpen]);
 
-  const total = cart.items.reduce((sum, i) => sum + i.price * i.qty, 0);
+  const subtotal = cart.items.reduce((sum, i) => sum + i.price * i.qty, 0);
+  const shippingFee = calculateShippingFee(subtotal);
+  const total = subtotal + shippingFee;
 
   if (!mounted) return null;
 
@@ -178,6 +181,13 @@ export function CartDrawer() {
         </div>
 
         <div className="border-t border-ink/10 px-5 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+          {cart.items.length > 0 && (
+            <p className="mb-2 font-sans text-xs text-ink-soft">
+              {shippingFee === 0
+                ? "You've got free shipping!"
+                : `Add ₹${(FREE_SHIPPING_THRESHOLD - subtotal).toLocaleString("en-IN")} more for free shipping.`}
+            </p>
+          )}
           <div className="mb-3 flex items-center justify-between font-sans text-sm text-ink">
             <span>Total</span>
             <span className="font-medium">₹{total.toLocaleString("en-IN")}</span>

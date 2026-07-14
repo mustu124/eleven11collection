@@ -10,10 +10,7 @@ const MOOD_SECTIONS = [
   { section: "mood_dayout", title: "Day Out" },
 ];
 
-const GIFTING_SECTIONS = [
-  { section: "gifting_her", title: "Gifts for Her" },
-  { section: "gifting_him", title: "Gifts for Him" },
-];
+const GIFTING_SECTIONS = [{ section: "gifting_her", title: "Gifts for Her" }];
 
 export default async function AdminHomepagePage() {
   const allSections = ["hero", ...MOOD_SECTIONS.map((m) => m.section), ...GIFTING_SECTIONS.map((g) => g.section)];
@@ -52,7 +49,7 @@ export default async function AdminHomepagePage() {
 
       <section>
         <h2 className="mb-3 font-sans text-xs uppercase tracking-wide text-ink-soft">Gifting Banners</h2>
-        <div className="grid gap-4 lg:grid-cols-2">
+        <div className="grid gap-4 lg:max-w-md">
           {GIFTING_SECTIONS.map((g) => (
             <BannerSectionEditor key={g.section} section={g.section} title={g.title} banners={bySection(g.section)} />
           ))}

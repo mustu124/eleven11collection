@@ -16,6 +16,8 @@ export function buildOrderMessage({
   address,
   pincode,
   items,
+  subtotal,
+  shippingFee,
   total,
 }: {
   orderRef: string;
@@ -23,6 +25,8 @@ export function buildOrderMessage({
   address: string;
   pincode: string;
   items: WhatsAppOrderItem[];
+  subtotal: number;
+  shippingFee: number;
   total: number;
 }): string {
   const itemLines = items.flatMap((item, i) => {
@@ -39,6 +43,8 @@ export function buildOrderMessage({
     "",
     ...itemLines,
     "",
+    `Subtotal: ₹${subtotal.toLocaleString("en-IN")}`,
+    `Shipping: ${shippingFee === 0 ? "FREE" : `₹${shippingFee.toLocaleString("en-IN")}`}`,
     `Total: ₹${total.toLocaleString("en-IN")}`,
     "",
     "Delivery Details:",

@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useCart } from "@/lib/store/cart-context";
 import { buildOrderMessage, getWhatsAppCheckoutUrl } from "@/lib/whatsapp";
+import { calculateShippingFee, FREE_SHIPPING_THRESHOLD } from "@/lib/shipping";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { BackButton } from "@/components/ui/BackButton";
 
@@ -35,7 +36,9 @@ export function CheckoutForm() {
   const [orderRef, setOrderRef] = useState<string | null>(null);
   const [waUrl, setWaUrl] = useState<string | null>(null);
 
-  const total = cart.items.reduce((sum, i) => sum + i.price * i.qty, 0);
+  const subtotal = cart.items.reduce((sum, i) => sum + i.price * i.qty, 0);
+  const shippingFee = calculateShippingFee(subtotal);
+  const total = subtotal + shippingFee;
 
   function updateField(name: keyof Fields, value: string) {
     setFields((f) => ({ ...f, [name]: value }));
@@ -90,6 +93,8 @@ export function CheckoutForm() {
         address: fields.address,
         pincode: fields.pincode,
         items: cart.items.map((i) => ({ name: i.name, qty: i.qty, price: i.price, slug: i.slug ?? null })),
+        subtotal: data.subtotal,
+        shippingFee: data.shippingFee,
         total: data.total,
       });
       const url = getWhatsAppCheckoutUrl(message);
@@ -280,9 +285,26 @@ export function CheckoutForm() {
             </li>
           ))}
         </ul>
-        <div className="mt-4 flex justify-between font-sans text-sm font-medium text-ink">
-          <span>Total</span>
-          <span>₹{total.toLocaleString("en-IN")}</span>
+        <div className="mt-4 space-y-2">
+          <div className="flex justify-between font-sans text-sm text-ink-soft">
+            <span>Subtotal</span>
+            <span>₹{subtotal.toLocaleString("en-IN")}</span>
+          </div>
+          <div className="flex justify-between font-sans text-sm text-ink-soft">
+            <span>Shipping</span>
+            <span className={shippingFee === 0 ? "text-green-700" : undefined}>
+              {shippingFee === 0 ? "FREE" : `₹${shippingFee.toLocaleString("en-IN")}`}
+            </span>
+          </div>
+          {shippingFee > 0 && (
+            <p className="font-sans text-xs text-ink-soft">
+              Add ₹{(FREE_SHIPPING_THRESHOLD - subtotal).toLocaleString("en-IN")} more to get free shipping.
+            </p>
+          )}
+          <div className="flex justify-between border-t border-ink/10 pt-2 font-sans text-sm font-medium text-ink">
+            <span>Total</span>
+            <span>₹{total.toLocaleString("en-IN")}</span>
+          </div>
         </div>
       </div>
     </div>

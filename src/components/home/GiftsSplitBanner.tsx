@@ -4,14 +4,23 @@ import { ImageWithFallback } from "@/components/ui/ImageWithFallback";
 
 const LABELS: Record<string, string> = {
   gifting_her: "Gifts for Her",
-  gifting_him: "Gifts for Him",
 };
 
 export function GiftsSplitBanner({ banners }: { banners: HomeBanner[] }) {
   if (banners.length === 0) return null;
 
+  // Only one gifting section exists (gifting_her) — grid-cols-2 was built for
+  // a two-up split and would leave a dead empty column with just one banner,
+  // so single vs. multiple banners get different treatments.
+  const isSingle = banners.length === 1;
+
   return (
-    <section aria-label="Gifting" className="grid grid-cols-1 gap-3 px-4 py-8 sm:grid-cols-2 md:px-8">
+    <section
+      aria-label="Gifting"
+      className={`grid grid-cols-1 gap-3 px-4 py-8 md:px-8 ${
+        isSingle ? "mx-auto max-w-sm" : "sm:grid-cols-2"
+      }`}
+    >
       {banners.map((banner) => {
         const content = (
           <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg sm:aspect-[3/4]">

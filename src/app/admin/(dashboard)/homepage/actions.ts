@@ -8,7 +8,7 @@ import { uploadBannerImage, deleteBannerImages, MAX_IMAGE_BYTES } from "@/lib/su
 export type ActionResult = { error: string | null };
 
 // ---------------------------------------------------------------------
-// Banners (hero, mood_daily, mood_party, mood_dayout, gifting_her, gifting_him)
+// Banners (hero, mood_daily, mood_party, mood_dayout, gifting_her)
 // ---------------------------------------------------------------------
 
 export async function saveBannerAction(formData: FormData): Promise<ActionResult> {

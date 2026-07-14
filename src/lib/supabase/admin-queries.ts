@@ -280,6 +280,41 @@ export async function getAdminBanners(sections: string[]): Promise<AdminBanner[]
   }));
 }
 
+export type AdminOffer = {
+  id: string;
+  title: string;
+  description: string | null;
+  imageUrl: string | null;
+  linkUrl: string | null;
+  isFeatured: boolean;
+  isActive: boolean;
+  sortOrder: number;
+};
+
+export async function getAdminOffers(): Promise<AdminOffer[]> {
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase
+    .from("offers")
+    .select("id, title, description, image_url, link_url, is_featured, is_active, sort_order")
+    .order("sort_order", { ascending: true });
+
+  if (error) {
+    console.error("Failed to load offers:", error.message);
+    return [];
+  }
+
+  return (data ?? []).map((o) => ({
+    id: o.id,
+    title: o.title,
+    description: o.description,
+    imageUrl: o.image_url,
+    linkUrl: o.link_url,
+    isFeatured: o.is_featured,
+    isActive: o.is_active,
+    sortOrder: o.sort_order,
+  }));
+}
+
 export type AdminTopStyleRow = {
   rowId: string;
   tab: string;
