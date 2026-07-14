@@ -56,10 +56,10 @@ export function buildOrderMessage({
 
 /**
  * wa.me numbers need the full international format with no "+" and no
- * leading zero. NEXT_PUBLIC_WHATSAPP_NUMBER is stored as a plain 10-digit
- * Indian mobile number, so a bare 10-digit value is assumed to need the
- * "91" country code prefixed; anything else is passed through as-is
- * (covers the case where the env var is later set to a full
+ * leading zero. The number is stored as a plain 10-digit Indian mobile
+ * number (admin-editable, see /admin/settings), so a bare 10-digit value is
+ * assumed to need the "91" country code prefixed; anything else is passed
+ * through as-is (covers the case where it's later set to a full
  * international number).
  */
 export function toWhatsAppNumber(raw: string): string {
@@ -67,8 +67,7 @@ export function toWhatsAppNumber(raw: string): string {
   return digits.length === 10 ? `91${digits}` : digits;
 }
 
-export function getWhatsAppCheckoutUrl(message: string): string {
-  const rawNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "";
-  const number = toWhatsAppNumber(rawNumber);
+export function getWhatsAppCheckoutUrl(message: string, whatsappNumber: string): string {
+  const number = toWhatsAppNumber(whatsappNumber);
   return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
 }

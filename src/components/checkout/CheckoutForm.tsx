@@ -21,7 +21,7 @@ function validate(fields: Fields): FieldErrors {
   return errors;
 }
 
-export function CheckoutForm() {
+export function CheckoutForm({ whatsappNumber }: { whatsappNumber: string }) {
   const cart = useCart();
   const [fields, setFields] = useState<Fields>({
     name: "",
@@ -97,7 +97,7 @@ export function CheckoutForm() {
         shippingFee: data.shippingFee,
         total: data.total,
       });
-      const url = getWhatsAppCheckoutUrl(message);
+      const url = getWhatsAppCheckoutUrl(message, whatsappNumber);
       setOrderRef(ref);
       setWaUrl(url);
 

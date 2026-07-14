@@ -159,6 +159,20 @@ export type Database = {
         Update: Partial<Database["public"]["Tables"]["offers"]["Insert"]>;
         Relationships: [];
       };
+      settings: {
+        Row: {
+          key: string;
+          value: string;
+          updated_at: string;
+        };
+        Insert: {
+          key: string;
+          value: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["settings"]["Insert"]>;
+        Relationships: [];
+      };
       homepage_top_styles: {
         Row: {
           id: string;

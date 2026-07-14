@@ -481,3 +481,24 @@ export async function getFeaturedOffer(): Promise<Offer | null> {
 
   return data ? mapOfferRow(data) : null;
 }
+
+/**
+ * Admin-editable via /admin/settings, stored in the `settings` table so it
+ * can change without a redeploy. Falls back to the env var if the table
+ * doesn't exist yet (pre-migration) or the row is missing, so checkout/
+ * contact links never break.
+ */
+export async function getWhatsAppNumber(): Promise<string> {
+  const envFallback = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "";
+  const { data, error } = await supabase
+    .from("settings")
+    .select("value")
+    .eq("key", "whatsapp_number")
+    .maybeSingle();
+
+  if (error || !data) {
+    if (error) console.error("Failed to load WhatsApp number setting:", error.message);
+    return envFallback;
+  }
+  return data.value;
+}

@@ -1,12 +1,18 @@
 import type { Metadata } from "next";
 import { Mail, MessageCircle, AtSign } from "lucide-react";
 import { toWhatsAppNumber } from "@/lib/whatsapp";
+import { getWhatsAppNumber } from "@/lib/supabase/queries";
 import { BackButton } from "@/components/ui/BackButton";
 
 export const metadata: Metadata = {
   title: "Contact Us",
   description: "Get in touch with Eleven11 Collection over WhatsApp, email, or Instagram.",
 };
+
+// Without this, the WhatsApp number (admin-editable in /admin/settings)
+// would freeze into this page's build-time value — same fix as the
+// homepage/product/category pages.
+export const revalidate = 60;
 
 const EMAIL = "Eleven11collection81@gmail.com";
 const INSTAGRAM_HANDLE = "eleven11_collection";
@@ -17,8 +23,8 @@ function formatIndianNumber(raw: string): string {
   return `+91 ${digits.slice(0, 5)} ${digits.slice(5)}`;
 }
 
-export default function ContactPage() {
-  const rawNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "";
+export default async function ContactPage() {
+  const rawNumber = await getWhatsAppNumber();
   const whatsappHref = `https://wa.me/${toWhatsAppNumber(rawNumber)}`;
   const displayNumber = formatIndianNumber(rawNumber);
 

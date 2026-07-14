@@ -8,14 +8,18 @@ export function CategoryCircles({ categories }: { categories: NavCategory[] }) {
   return (
     <section aria-label="Shop by category" className="px-4 py-8 md:px-8">
       <h2 className="mb-4 text-center font-serif text-xl text-ink">Shop by Category</h2>
-      <ul className="no-scrollbar flex snap-x gap-5 overflow-x-auto px-1 pb-1">
+      {/* Mobile: a fixed 3-column grid that wraps into as many rows as
+          needed — no horizontal scroll, and it holds regardless of how many
+          categories get added. Tablet/desktop keep the original horizontally
+          scrollable single row, which has room to breathe at that width. */}
+      <ul className="grid grid-cols-3 gap-x-2 gap-y-5 sm:no-scrollbar sm:flex sm:snap-x sm:gap-5 sm:overflow-x-auto sm:px-1 sm:pb-1">
         {categories.map((category) => (
-          <li key={category.id} className="snap-start">
+          <li key={category.id} className="sm:snap-start">
             <Link
               href={`/category/${category.slug}`}
-              className="flex w-20 flex-col items-center gap-2 sm:w-24"
+              className="flex flex-col items-center gap-2 sm:w-24"
             >
-              <span className="relative block h-20 w-20 overflow-hidden rounded-full bg-ivory-soft ring-1 ring-ink/10 sm:h-24 sm:w-24">
+              <span className="relative block h-16 w-16 overflow-hidden rounded-full bg-ivory-soft ring-1 ring-ink/10 sm:h-24 sm:w-24">
                 {category.image_url ? (
                   <Image
                     src={category.image_url}
