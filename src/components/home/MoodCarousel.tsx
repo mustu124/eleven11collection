@@ -43,12 +43,19 @@ export function MoodCarousel({ banners }: { banners: HomeBanner[] }) {
       <h2 className="mb-4 text-center font-serif text-xl text-ink">
         Daily Wear, Party Wear &amp; Day Out
       </h2>
-      <Carousel
-        slides={slides}
-        ariaLabel="Occasion banners"
-        showDots={false}
-        slideClassName="w-[60vw] shrink-0 snap-start pr-3 sm:w-[260px]"
-      />
+      {/* Fixed-width slides don't stretch to fill a full-bleed section, so on
+          wide desktop screens a handful of cards were left flush-left with a
+          large dead gap on the right — capping and centering the width fixes
+          that while staying a no-op on mobile (viewport is already narrower
+          than the cap) and still scrolling normally if more cards are added. */}
+      <div className="mx-auto max-w-4xl">
+        <Carousel
+          slides={slides}
+          ariaLabel="Occasion banners"
+          showDots={false}
+          slideClassName="w-[60vw] shrink-0 snap-start pr-3 sm:w-[260px]"
+        />
+      </div>
     </section>
   );
 }

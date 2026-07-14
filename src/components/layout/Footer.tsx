@@ -4,19 +4,11 @@ import Image from "next/image";
 const FOOTER_COLUMNS = [
   {
     heading: "Help",
-    links: [
-      { label: "Contact Us", href: "/contact" },
-      { label: "Track Order", href: "/track-order" },
-      { label: "Shipping & Returns", href: "/shipping-returns" },
-    ],
+    links: [{ label: "Contact Us", href: "/contact" }],
   },
   {
     heading: "About",
-    links: [
-      { label: "Our Story", href: "/about" },
-      { label: "Privacy Policy", href: "/privacy-policy" },
-      { label: "Terms & Conditions", href: "/terms" },
-    ],
+    links: [{ label: "Our Story", href: "/about" }],
   },
 ];
 
@@ -45,10 +37,8 @@ export function Footer() {
             <ul className="mt-1">
               {column.links.map((link) => (
                 <li key={link.href}>
-                  {/* prefetch off: these pages aren't built yet (later prompt) — prefetching a 404 just spams the console */}
                   <Link
                     href={link.href}
-                    prefetch={false}
                     className="flex min-h-11 items-center font-sans text-sm text-ink-soft hover:text-gold"
                   >
                     {link.label}
