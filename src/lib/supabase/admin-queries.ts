@@ -255,13 +255,18 @@ export type AdminBanner = {
   linkUrl: string | null;
   sortOrder: number;
   isActive: boolean;
+  eyebrowText: string | null;
+  headingText: string | null;
+  subheadingText: string | null;
 };
 
 export async function getAdminBanners(sections: string[]): Promise<AdminBanner[]> {
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase
     .from("homepage_banners")
-    .select("id, section, image_url, link_url, sort_order, is_active")
+    .select(
+      "id, section, image_url, link_url, sort_order, is_active, eyebrow_text, heading_text, subheading_text"
+    )
     .in("section", sections)
     .order("sort_order", { ascending: true });
 
@@ -277,6 +282,9 @@ export async function getAdminBanners(sections: string[]): Promise<AdminBanner[]
     linkUrl: b.link_url,
     sortOrder: b.sort_order,
     isActive: b.is_active,
+    eyebrowText: b.eyebrow_text,
+    headingText: b.heading_text,
+    subheadingText: b.subheading_text,
   }));
 }
 

@@ -9,6 +9,9 @@ import {
   saveCategoryAction,
 } from "@/app/admin/(dashboard)/categories/actions";
 import type { AdminCategoryOption } from "@/lib/supabase/admin-queries";
+import { ImageWithFallback } from "@/components/ui/ImageWithFallback";
+
+const MAX_BYTES = 5 * 1024 * 1024;
 
 function slugify(input: string) {
   return input
@@ -31,6 +34,8 @@ export function CategoryManager({ categories }: { categories: AdminCategoryOptio
   const [isPending, startTransition] = useTransition();
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [reordering, setReordering] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   function startEdit(category: AdminCategoryOption) {
     setShowAddForm(false);
@@ -41,6 +46,8 @@ export function CategoryManager({ categories }: { categories: AdminCategoryOptio
       imageUrl: category.imageUrl ?? "",
       isActive: category.isActive,
     });
+    setFile(null);
+    setPreviewUrl(null);
     setError(null);
   }
 
@@ -48,13 +55,31 @@ export function CategoryManager({ categories }: { categories: AdminCategoryOptio
     setEditingId(null);
     setShowAddForm(true);
     setForm(EMPTY_FORM);
+    setFile(null);
+    setPreviewUrl(null);
     setError(null);
   }
 
   function cancelForm() {
     setEditingId(null);
     setShowAddForm(false);
+    setFile(null);
+    setPreviewUrl(null);
     setError(null);
+  }
+
+  function handleFile(f: File) {
+    setError(null);
+    if (!f.type.startsWith("image/")) {
+      setError(`"${f.name}" isn't an image.`);
+      return;
+    }
+    if (f.size > MAX_BYTES) {
+      setError(`"${f.name}" is ${(f.size / 1024 / 1024).toFixed(1)}MB — the limit is 5MB.`);
+      return;
+    }
+    setFile(f);
+    setPreviewUrl(URL.createObjectURL(f));
   }
 
   function handleSave(e: React.FormEvent) {
@@ -66,6 +91,7 @@ export function CategoryManager({ categories }: { categories: AdminCategoryOptio
     formData.append("slug", form.slug);
     formData.append("image_url", form.imageUrl);
     if (form.isActive) formData.append("is_active", "on");
+    if (file) formData.append("imageFile", file);
 
     startTransition(async () => {
       const result = await saveCategoryAction(formData);
@@ -150,6 +176,8 @@ export function CategoryManager({ categories }: { categories: AdminCategoryOptio
           isPending={isPending}
           inputClass={inputClass}
           submitLabel="Add"
+          previewUrl={previewUrl}
+          onFile={handleFile}
         />
       )}
 
@@ -166,6 +194,8 @@ export function CategoryManager({ categories }: { categories: AdminCategoryOptio
                 isPending={isPending}
                 inputClass={inputClass}
                 submitLabel="Save"
+                previewUrl={previewUrl}
+                onFile={handleFile}
               />
             </li>
           ) : (
@@ -217,6 +247,8 @@ function CategoryFormRow({
   isPending,
   inputClass,
   submitLabel,
+  previewUrl,
+  onFile,
 }: {
   form: FormValues;
   setForm: (form: FormValues) => void;
@@ -226,6 +258,8 @@ function CategoryFormRow({
   isPending: boolean;
   inputClass: string;
   submitLabel: string;
+  previewUrl: string | null;
+  onFile: (file: File) => void;
 }) {
   return (
     <form onSubmit={onSubmit} noValidate className="mb-4 grid gap-3 rounded-lg border border-ink/10 bg-white p-4 sm:grid-cols-2">
@@ -245,14 +279,46 @@ function CategoryFormRow({
         />
       </div>
       <div className="sm:col-span-2">
-        <label className="mb-1 block font-sans text-xs uppercase tracking-wide text-ink-soft">
-          Image URL (optional)
-        </label>
+        <label className="mb-1 block font-sans text-xs uppercase tracking-wide text-ink-soft">Image</label>
+        <div
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={(e) => {
+            e.preventDefault();
+            const f = e.dataTransfer.files[0];
+            if (f) onFile(f);
+          }}
+          className="flex items-center gap-3 rounded-md border border-dashed border-ink/20 p-2"
+        >
+          {(previewUrl || form.imageUrl) && (
+            <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded bg-ivory-soft">
+              {previewUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={previewUrl} alt="" className="h-full w-full object-cover" />
+              ) : (
+                <ImageWithFallback src={form.imageUrl} alt="" fill sizes="56px" className="object-cover" />
+              )}
+            </div>
+          )}
+          <label className="flex-1 cursor-pointer font-sans text-xs text-ink-soft">
+            Drag &amp; drop or click to upload
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) onFile(f);
+                e.target.value = "";
+              }}
+            />
+          </label>
+        </div>
         <input
           type="text"
+          placeholder="Or paste an image URL"
           value={form.imageUrl}
           onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
-          className={inputClass}
+          className={`${inputClass} mt-2`}
         />
       </div>
       <div className="flex items-center justify-between sm:col-span-2">

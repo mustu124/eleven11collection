@@ -43,12 +43,15 @@ export type HomeBanner = {
   section: string;
   image_url: string;
   link_url: string | null;
+  eyebrow_text: string | null;
+  heading_text: string | null;
+  subheading_text: string | null;
 };
 
 async function getBannersBySections(sections: string[]): Promise<HomeBanner[]> {
   const { data, error } = await supabase
     .from("homepage_banners")
-    .select("id, section, image_url, link_url")
+    .select("id, section, image_url, link_url, eyebrow_text, heading_text, subheading_text")
     .eq("is_active", true)
     .in("section", sections)
     .order("sort_order", { ascending: true });
@@ -68,7 +71,7 @@ export function getHeroBanners(): Promise<HomeBanner[]> {
 export async function getMoodBanners(): Promise<HomeBanner[]> {
   const { data, error } = await supabase
     .from("homepage_banners")
-    .select("id, section, image_url, link_url")
+    .select("id, section, image_url, link_url, eyebrow_text, heading_text, subheading_text")
     .eq("is_active", true)
     .like("section", "mood_%")
     .order("sort_order", { ascending: true });

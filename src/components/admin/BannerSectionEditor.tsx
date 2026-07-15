@@ -24,6 +24,9 @@ export function BannerSectionEditor({
   const [linkUrl, setLinkUrl] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [isActive, setIsActive] = useState(true);
+  const [eyebrowText, setEyebrowText] = useState("");
+  const [headingText, setHeadingText] = useState("");
+  const [subheadingText, setSubheadingText] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -38,6 +41,9 @@ export function BannerSectionEditor({
     setFile(null);
     setPreviewUrl(null);
     setError(null);
+    setEyebrowText("");
+    setHeadingText("");
+    setSubheadingText("");
   }
 
   function startEdit(banner: AdminBanner) {
@@ -49,6 +55,9 @@ export function BannerSectionEditor({
     setFile(null);
     setPreviewUrl(null);
     setError(null);
+    setEyebrowText(banner.eyebrowText ?? "");
+    setHeadingText(banner.headingText ?? "");
+    setSubheadingText(banner.subheadingText ?? "");
   }
 
   function handleFile(f: File) {
@@ -75,6 +84,11 @@ export function BannerSectionEditor({
     formData.append("image_url", imageUrl);
     if (isActive) formData.append("is_active", "on");
     if (file) formData.append("imageFile", file);
+    if (section === "hero") {
+      formData.append("eyebrow_text", eyebrowText);
+      formData.append("heading_text", headingText);
+      formData.append("subheading_text", subheadingText);
+    }
 
     startTransition(async () => {
       const result = await saveBannerAction(formData);
@@ -187,6 +201,31 @@ export function BannerSectionEditor({
             onChange={(e) => setLinkUrl(e.target.value)}
             className="w-full rounded-md border border-ink/15 px-3 py-1.5 font-sans text-xs text-ink focus:outline-none focus:ring-1 focus:ring-gold"
           />
+          {section === "hero" && (
+            <>
+              <input
+                type="text"
+                placeholder="Eyebrow text (e.g. Eleven 11 Collection)"
+                value={eyebrowText}
+                onChange={(e) => setEyebrowText(e.target.value)}
+                className="w-full rounded-md border border-ink/15 px-3 py-1.5 font-sans text-xs text-ink focus:outline-none focus:ring-1 focus:ring-gold"
+              />
+              <input
+                type="text"
+                placeholder="Headline (e.g. Timeless diamonds, made for you)"
+                value={headingText}
+                onChange={(e) => setHeadingText(e.target.value)}
+                className="w-full rounded-md border border-ink/15 px-3 py-1.5 font-sans text-xs text-ink focus:outline-none focus:ring-1 focus:ring-gold"
+              />
+              <input
+                type="text"
+                placeholder="Description (e.g. Fine jewellery crafted with rare stones...)"
+                value={subheadingText}
+                onChange={(e) => setSubheadingText(e.target.value)}
+                className="w-full rounded-md border border-ink/15 px-3 py-1.5 font-sans text-xs text-ink focus:outline-none focus:ring-1 focus:ring-gold"
+              />
+            </>
+          )}
           <div className="flex items-center justify-between">
             <label className="flex items-center gap-2 font-sans text-xs text-ink">
               <input

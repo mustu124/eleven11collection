@@ -20,13 +20,13 @@ export function HeroCarousel({ banners }: { banners: HomeBanner[] }) {
         <div className="absolute inset-0 bg-gradient-to-t from-ink/30 via-transparent to-transparent" />
         <div className="absolute inset-0 flex flex-col justify-end gap-2 p-6 sm:justify-center sm:gap-3 sm:p-12">
           <p className="w-fit rounded bg-white/70 px-3 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-gold-dark backdrop-blur-sm sm:text-sm">
-            Eleven 11 Collection
+            {banner.eyebrow_text || "Eleven 11 Collection"}
           </p>
           <h1 className="w-fit max-w-md rounded bg-white/70 px-4 py-2 font-serif text-3xl font-bold leading-tight text-ink backdrop-blur-sm sm:text-5xl">
-            Timeless diamonds, made for you
+            {banner.heading_text || "Timeless diamonds, made for you"}
           </h1>
           <p className="w-fit max-w-sm rounded bg-white/70 px-3 py-1.5 text-sm text-ink/85 backdrop-blur-sm sm:text-base">
-            Fine jewellery crafted with rare stones and lasting brilliance.
+            {banner.subheading_text || "Fine jewellery crafted with rare stones and lasting brilliance."}
           </p>
           <span className="mt-2 inline-flex w-fit items-center rounded-full bg-gold px-6 py-3 text-xs font-semibold uppercase tracking-wide text-white shadow-sm sm:text-sm">
             Shop Now

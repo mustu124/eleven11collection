@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { requireAdminUser } from "@/lib/supabase/admin-auth";
+import { uploadCategoryImage, deleteCategoryImages, MAX_IMAGE_BYTES } from "@/lib/supabase/storage";
 
 export type ActionResult = { error: string | null };
 
@@ -21,11 +22,28 @@ export async function saveCategoryAction(formData: FormData): Promise<ActionResu
   const name = ((formData.get("name") as string) ?? "").trim();
   const slugInput = ((formData.get("slug") as string) ?? "").trim();
   const slug = slugify(slugInput || name);
-  const imageUrl = ((formData.get("image_url") as string) ?? "").trim() || null;
+  const manualImageUrl = ((formData.get("image_url") as string) ?? "").trim();
   const isActive = formData.get("is_active") === "on";
+  const file = formData.get("imageFile");
+  const imageFile = file instanceof File && file.size > 0 ? file : null;
 
   if (!name) return { error: "Category name is required." };
   if (!slug) return { error: "Please use a category name with at least one letter or number." };
+
+  let imageUrl: string | null = manualImageUrl || null;
+
+  if (imageFile) {
+    if (imageFile.size > MAX_IMAGE_BYTES) {
+      return {
+        error: `"${imageFile.name}" is ${(imageFile.size / 1024 / 1024).toFixed(1)}MB — the limit is ${MAX_IMAGE_BYTES / 1024 / 1024}MB.`,
+      };
+    }
+    try {
+      imageUrl = await uploadCategoryImage(imageFile);
+    } catch (err) {
+      return { error: err instanceof Error ? err.message : "Image upload failed." };
+    }
+  }
 
   if (categoryId) {
     const { error } = await supabaseAdmin
@@ -81,6 +99,12 @@ export async function deleteCategoryAction(categoryId: string): Promise<ActionRe
     };
   }
 
+  const { data: category } = await supabaseAdmin
+    .from("categories")
+    .select("image_url")
+    .eq("id", categoryId)
+    .maybeSingle();
+
   const { error } = await supabaseAdmin.from("categories").delete().eq("id", categoryId);
   if (error) {
     // Defensive fallback in case of a race (a product was added between the
@@ -90,6 +114,10 @@ export async function deleteCategoryAction(categoryId: string): Promise<ActionRe
       return { error: "This category still has products in it and can't be deleted." };
     }
     return { error: `Could not delete category: ${error.message}` };
+  }
+
+  if (category?.image_url) {
+    await deleteCategoryImages([category.image_url]);
   }
 
   revalidatePath("/", "layout");

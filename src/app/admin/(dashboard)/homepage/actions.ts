@@ -21,6 +21,9 @@ export async function saveBannerAction(formData: FormData): Promise<ActionResult
   const manualImageUrl = ((formData.get("image_url") as string) ?? "").trim();
   const file = formData.get("imageFile");
   const imageFile = file instanceof File && file.size > 0 ? file : null;
+  const eyebrowText = ((formData.get("eyebrow_text") as string) ?? "").trim() || null;
+  const headingText = ((formData.get("heading_text") as string) ?? "").trim() || null;
+  const subheadingText = ((formData.get("subheading_text") as string) ?? "").trim() || null;
 
   if (!section) return { error: "Missing section." };
 
@@ -44,7 +47,14 @@ export async function saveBannerAction(formData: FormData): Promise<ActionResult
   if (bannerId) {
     const { error } = await supabaseAdmin
       .from("homepage_banners")
-      .update({ image_url: imageUrl, link_url: linkUrl, is_active: isActive })
+      .update({
+        image_url: imageUrl,
+        link_url: linkUrl,
+        is_active: isActive,
+        eyebrow_text: eyebrowText,
+        heading_text: headingText,
+        subheading_text: subheadingText,
+      })
       .eq("id", bannerId);
     if (error) return { error: `Could not update banner: ${error.message}` };
   } else {
@@ -63,6 +73,9 @@ export async function saveBannerAction(formData: FormData): Promise<ActionResult
       link_url: linkUrl,
       is_active: isActive,
       sort_order: nextSortOrder,
+      eyebrow_text: eyebrowText,
+      heading_text: headingText,
+      subheading_text: subheadingText,
     });
     if (error) return { error: `Could not create banner: ${error.message}` };
   }

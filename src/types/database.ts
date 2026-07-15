@@ -121,6 +121,9 @@ export type Database = {
           link_url: string | null;
           sort_order: number;
           is_active: boolean;
+          eyebrow_text: string | null;
+          heading_text: string | null;
+          subheading_text: string | null;
         };
         Insert: {
           id?: string;
@@ -129,6 +132,9 @@ export type Database = {
           link_url?: string | null;
           sort_order?: number;
           is_active?: boolean;
+          eyebrow_text?: string | null;
+          heading_text?: string | null;
+          subheading_text?: string | null;
         };
         Update: Partial<Database["public"]["Tables"]["homepage_banners"]["Insert"]>;
         Relationships: [];

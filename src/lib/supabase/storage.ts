@@ -73,3 +73,11 @@ export function uploadOfferImage(file: File): Promise<string> {
 export function deleteOfferImages(urls: string[]): Promise<void> {
   return deleteImages(urls, BANNER_BUCKET);
 }
+
+export function uploadCategoryImage(file: File): Promise<string> {
+  return uploadImage(file, BANNER_BUCKET, "categories");
+}
+
+export function deleteCategoryImages(urls: string[]): Promise<void> {
+  return deleteImages(urls, BANNER_BUCKET);
+}
