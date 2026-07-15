@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Upload, X } from "lucide-react";
 
 const MAX_BYTES = 5 * 1024 * 1024; // 5MB — matches scripts/setup-storage.mjs and lib/supabase/storage.ts
+export const MAX_PRODUCT_IMAGES = 4;
 
 export type ExistingImage = { id: string; image_url: string; sort_order: number };
 
@@ -22,6 +23,8 @@ export function ImageDropzone({
   const inputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const totalCount = existingImages.length + newFiles.length;
+  const remainingSlots = Math.max(0, MAX_PRODUCT_IMAGES - totalCount);
 
   function addFiles(fileList: FileList | File[]) {
     setError(null);
@@ -37,6 +40,10 @@ export function ImageDropzone({
         rejected.push(`"${file.name}" is ${(file.size / 1024 / 1024).toFixed(1)}MB — the limit is 5MB.`);
         continue;
       }
+      if (accepted.length >= remainingSlots) {
+        rejected.push(`"${file.name}" was skipped — a product can have at most ${MAX_PRODUCT_IMAGES} images.`);
+        continue;
+      }
       accepted.push(file);
     }
 
@@ -46,39 +53,47 @@ export function ImageDropzone({
 
   return (
     <div>
-      <div
-        onDragOver={(e) => {
-          e.preventDefault();
-          setIsDragging(true);
-        }}
-        onDragLeave={() => setIsDragging(false)}
-        onDrop={(e) => {
-          e.preventDefault();
-          setIsDragging(false);
-          addFiles(e.dataTransfer.files);
-        }}
-        onClick={() => inputRef.current?.click()}
-        role="button"
-        tabIndex={0}
-        className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-md border-2 border-dashed px-4 py-8 text-center transition-colors ${
-          isDragging ? "border-gold bg-gold/5" : "border-ink/20 hover:border-gold"
-        }`}
-      >
-        <Upload className="h-6 w-6 text-ink-soft" aria-hidden="true" />
-        <p className="font-sans text-sm text-ink-soft">Drag &amp; drop images here, or click to browse</p>
-        <p className="font-sans text-xs text-ink-soft/70">JPG, PNG, WEBP or GIF — up to 5MB each</p>
-        <input
-          ref={inputRef}
-          type="file"
-          accept="image/*"
-          multiple
-          className="hidden"
-          onChange={(e) => {
-            if (e.target.files) addFiles(e.target.files);
-            e.target.value = "";
+      {remainingSlots > 0 ? (
+        <div
+          onDragOver={(e) => {
+            e.preventDefault();
+            setIsDragging(true);
           }}
-        />
-      </div>
+          onDragLeave={() => setIsDragging(false)}
+          onDrop={(e) => {
+            e.preventDefault();
+            setIsDragging(false);
+            addFiles(e.dataTransfer.files);
+          }}
+          onClick={() => inputRef.current?.click()}
+          role="button"
+          tabIndex={0}
+          className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-md border-2 border-dashed px-4 py-8 text-center transition-colors ${
+            isDragging ? "border-gold bg-gold/5" : "border-ink/20 hover:border-gold"
+          }`}
+        >
+          <Upload className="h-6 w-6 text-ink-soft" aria-hidden="true" />
+          <p className="font-sans text-sm text-ink-soft">Drag &amp; drop images here, or click to browse</p>
+          <p className="font-sans text-xs text-ink-soft/70">
+            JPG, PNG, WEBP or GIF — up to 5MB each · {totalCount}/{MAX_PRODUCT_IMAGES} images used
+          </p>
+          <input
+            ref={inputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            className="hidden"
+            onChange={(e) => {
+              if (e.target.files) addFiles(e.target.files);
+              e.target.value = "";
+            }}
+          />
+        </div>
+      ) : (
+        <p className="rounded-md border border-ink/10 bg-ivory-soft px-4 py-3 text-center font-sans text-xs text-ink-soft">
+          Maximum of {MAX_PRODUCT_IMAGES} images reached — remove one to add another.
+        </p>
+      )}
 
       {error && (
         <p role="alert" className="mt-2 font-sans text-sm text-red-600">

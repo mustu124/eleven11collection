@@ -7,6 +7,8 @@ import { uploadProductImage, deleteProductImages, MAX_IMAGE_BYTES } from "@/lib/
 
 export type ActionResult = { error: string | null };
 
+const MAX_PRODUCT_IMAGES = 4;
+
 function slugify(input: string) {
   return input
     .toLowerCase()
@@ -76,6 +78,10 @@ export async function saveProductAction(formData: FormData): Promise<ActionResul
   }
 
   const newImageFiles = formData.getAll("newImages").filter((f): f is File => f instanceof File && f.size > 0);
+
+  if (keepImages.length + newImageFiles.length > MAX_PRODUCT_IMAGES) {
+    return { error: `A product can have at most ${MAX_PRODUCT_IMAGES} images.` };
+  }
 
   // Validate sizes before touching the DB at all — a rejected upload
   // shouldn't leave a half-saved product behind.
